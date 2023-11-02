@@ -1,0 +1,3 @@
+TOKEN = '6393930691:AAFqCnd4V3oKSf9cHfwVTPSUxI51qYELYbw'
+WEBHOOK_PATH = f"/telegramBot/bot/{TOKEN}"
+WEBHOOK_URL = "https://9d1b-37-113-172-55.eu.ngrok.io" + WEBHOOK_PATH

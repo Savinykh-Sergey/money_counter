@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <title>moneyCountSite</title>
+</head>
+<body>
+    <div class="container">
+        <header class="d-flex justify-content-center py-3">
+            <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login="m0neyc0untbot" data-size="large" data-auth-url="https://money-counter.onrender.com/login" data-request-access="write"></script>
+        </header>
+    </div>
+
+    <div class="d-flex flex-column justify-content-around align-items-center">
+        <div>
+            <h1>Главная</h1>
+        </div>
+
+        <form class="d-flex flex-column send-form"
+            enctype="multipart/form-data"
+            action="/users/1/photos/"
+            method="POST">
+            <input class="form-control my-image-field" type="FILE" name="file"/>
+            <input class="btn btn-primary" type="submit" name="Upload" value="Upload" />
+        </form>
+
+    </div>
+
+    <footer class="bg-light text-center text-lg-start fixed-bottom">
+  <!-- Copyright -->
+  <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
+    © 2023 Copyright: Money Counter
+      <br/>
+      Практика
+  </div>
+  <!-- Copyright -->
+</footer>
+    <script>
+        let user_id;
+        let form = document.querySelector('.send-form')
+        let key, value, i;
+        let cookieArray  = document.cookie.split(';');
+
+        for (i = 0; i < cookieArray.length; i++){
+            key = cookieArray[i].substr(0, cookieArray[i].indexOf("="));
+            value = cookieArray[i].substr(cookieArray[i].indexOf("=")+1);
+
+            if (key == 'email'){
+                alert('Email is ' + value);
+            }
+
+            if (key == 'user_id'){
+                user_id = value
+            }
+        }
+        console.log('/users/' + user_id + '/photos/')
+        form.action = '/users/' + user_id + '/photos/'
+        form.method = 'POST'
+
+    </script>
+<script>
+    let form = document.querySelector('.send-form')
+    const compressImage = async (file, { quality = 1, type = file.type }) => {
+        // Get as image data
+        const imageBitmap = await createImageBitmap(file);
+
+        // Draw to canvas
+        const canvas = document.createElement('canvas');
+        canvas.width = imageBitmap.width;
+        canvas.height = imageBitmap.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(imageBitmap, 0, 0);
+
+        // Turn into Blob
+        const blob = await new Promise((resolve) =>
+            canvas.toBlob(resolve, type, quality)
+        );
+
+        // Turn Blob into File
+        return new File([blob], file.name, {
+            type: blob.type,
+        });
+    };
+
+    // Get the selected file from the file input
+    const input = document.querySelector('.my-image-field');
+    input.addEventListener('change', async (e) => {
+        // Get the files
+        const { files } = e.target;
+
+        // No files selected
+        if (!files.length) return;
+
+        // We'll store the files in this data transfer object
+        const dataTransfer = new DataTransfer();
+
+        // For every file in the files list
+        for (const file of files) {
+            // We don't have to compress files that aren't images
+            if (!file.type.startsWith('image')) {
+                // Ignore this file, but do add it to our result
+                dataTransfer.items.add(file);
+                continue;
+            }
+
+            // We compress the file by 50%
+            const compressedFile = await compressImage(file, {
+                quality: 0.5,
+                type: 'image/jpeg',
+            });
+
+            // Save back the compressed file instead of the original file
+            dataTransfer.items.add(compressedFile);
+        }
+
+        // Set value of the file input to our new files list
+        e.target.files = dataTransfer.files;
+    });
+</script>
+</body>
+</html>
